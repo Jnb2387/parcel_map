@@ -57,6 +57,37 @@
                 maxZoom: 16.7
             })
         );
+        map.on('load', function () {
+            map.on('click', 'parcels_fill', function (e) {
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(e.features[0].properties.total_valu)
+                    .addTo(map);
+            });
+            map.on('click', function (e) {
+                var features = map.queryRenderedFeatures(e.point);
+               console.log(features)
+            });
+
+            // Change the cursor to a pointer when the mouse is over the states layer.
+            map.on('mouseenter', 'parcels_fill', function () {
+                map.setFeatureState(
+            {
+              source: "parcels_fill",
+              id: e.features[0].id
+            },
+            {
+              id: 1
+            }
+          );
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves.
+            map.on('mouseleave', 'parcels_fill', function () {
+                map.getCanvas().style.cursor = '';
+            });
+        });
     </script>
 
 </body>
