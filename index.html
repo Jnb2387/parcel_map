@@ -41,7 +41,8 @@
         map.addControl(
             new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl
+                mapboxgl: mapboxgl,
+                collapsed: true
             })
         );
         map.addControl(new mapboxgl.NavigationControl(), "top-right");
@@ -53,7 +54,7 @@
                     enableHighAccuracy: true
                 },
                 trackUserLocation: true,
-                maxZoom: 16.5
+                maxZoom: 16.7
             })
         );
     </script>
