@@ -61,6 +61,7 @@
         href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
         type="text/css" />
     <div id="map"></div>
+    <span id="nbhd_name"></span>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZGxleTIzODciLCJhIjoiY2pnMTk0ZTk2NmJzOTJxbnZpMjl1ZGsxbiJ9.L-BSY_VjUrkHL3ov0OciKQ';
         var map = new mapboxgl.Map({
@@ -91,6 +92,23 @@
             trackUserLocation: true,
             maxZoom: 16.7
         });
+        geocoder.on('result', function (e) {
+// wait until the map has finished flying to the searched point
+    map.once('moveend', function () {
+        // add the result as a point in the 'search_point' layer to show up as marker
+        var geocoder_result = e.result.geometry;
+        map.getSource('search').setData(geocoder_result);
+
+        //project to use (pixel xy coordinates instead of lat/lon for WebGL)
+        var geocoder_point = map.project([e.result.center[0], e.result.center[1]]);
+
+        var parcel = map.queryRenderedFeatures(geocoder_point, {
+            layers: ['neighborhoods']
+        });
+        document.querySelector("#nbhd_name").innerHTML= parcel
+
+    });
+});
         map.addControl(geolocate);
         geolocate.on('geolocate', function (e) {
             console.log(e)
@@ -104,6 +122,7 @@
                 layers: ['neighborhoods']
             });
             console.log(parcel)
+            document.querySelector("#nbhd_name").innerHTML= parcel
         })
 
         // // Create dollar sign number formatter.
