@@ -101,7 +101,7 @@
             var geocoder_point = map.project(geocoder_result);
             console.log(geocoder_point)
             var parcel = map.queryRenderedFeatures(geocoder_point, {
-                layers: ['neighboords']
+                layers: ['neighborhoods']
             });
             console.log(parcel)
         })
@@ -129,7 +129,7 @@
                 let description = `
                     <table class="table_color" style="margin-top:10px;">
                     <tr><td style="font-size:15px;">Total Value</td>
-                        <td id="studentid" style="font-weight:500;font-size:15px;">${formatter.format(p.total_valu)}</td>
+                        <td id="studentid" style="font-weight:500;font-size:15px;">${formatter.format(p.total_valu_og)}</td>
                     </tr>
                     <tr><td>Name</td><td> ${p.owner_name} </td></tr>
                     <tr><td>Year Built</td><td> ${p.ccyrblt} </td></tr>
