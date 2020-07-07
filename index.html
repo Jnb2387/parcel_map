@@ -70,25 +70,42 @@
             zoom: 10, // starting zoom
             hash: true
         });
-        map.addControl(
-            new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl,
-                collapsed: true
-            })
-        );
+        let geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl,
+            flyTo: {
+                zoom: 16,
+                speed: 19,
+
+            },
+            collapsed: true
+        })
+        map.addControl(geocoder);
         map.addControl(new mapboxgl.NavigationControl(), "top-right");
         map.addControl(new mapboxgl.FullscreenControl());
         // Add geolocate control to the map.
-        map.addControl(
-            new mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true
-                },
-                trackUserLocation: true,
-                maxZoom: 16.7
-            })
-        );
+        let geolocate = new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true,
+            maxZoom: 16.7
+        });
+        map.addControl(geolocate);
+        geolocate.on('geolocate', function (e) {
+            console.log(e)
+
+            var geocoder_result = [e.coords.longitude, e.coords.latitude];
+            console.log(geocoder_result)
+            //project to use (pixel xy coordinates instead of lat/lon for WebGL)
+            var geocoder_point = map.project(geocoder_result);
+            console.log(geocoder_point)
+            var parcel = map.queryRenderedFeatures(geocoder_point, {
+                layers: ['neighboords']
+            });
+            console.log(parcel)
+        })
+
         // // Create dollar sign number formatter.
         var formatter = new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -96,6 +113,17 @@
             minimumFractionDigits: 0
         });
         map.on('load', function () {
+            // geolocate.trigger();
+
+            map.on('click', function (e) {
+                var features = map.queryRenderedFeatures(e.point);
+                console.log(features)
+                map.removeFeatureState({
+                    source: 'composite',
+                    sourceLayer: 'parcels'
+                });
+            });
+
             map.on('click', 'parcels_fill', function (e) {
                 let p = e.features[0].properties;
                 let description = `
@@ -106,8 +134,9 @@
                     <tr><td>Name</td><td> ${p.owner_name} </td></tr>
                     <tr><td>Year Built</td><td> ${p.ccyrblt} </td></tr>
                     <tr><td>Schedum</td><td> ${p.schednum} </td></tr>
-                    <tr><td>Disability</td><td> <a target="_blank" href="https://www.denvergov.org/property/realproperty/summary/${p.pin}">More Info</a> </td></tr>
-                    </table>`;
+                    </table>
+                    <a style="text-align:center;" target="_blank" href="https://www.denvergov.org/property/realproperty/summary/${p.pin}">More Info</a>
+                    `;
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
                     .setHTML(description)
@@ -124,12 +153,11 @@
                     hover: true
                 });
             });
-            map.on('click', function (e) {
-                var features = map.queryRenderedFeatures(e.point);
-                console.log(features)
-            });
 
-            // Change it back to a pointer when it leaves.
+
+            map.on('mouseenter', 'parcels_fill', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
             map.on('mouseleave', 'parcels_fill', function () {
                 map.getCanvas().style.cursor = '';
             });
