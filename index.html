@@ -19,6 +19,38 @@
             bottom: 0;
             width: 100%;
         }
+
+        .mapboxgl-popup {
+            max-width: 700px !important;
+        }
+
+        .mapboxgl-popup-close-button {
+            right: 4px;
+            font-size: 25px;
+        }
+
+        table {
+            font-family: "Roboto", sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #b4b2b2;
+        }
+
+        td {
+            border: 0px solid #dddddd;
+            text-align: left;
+            padding: 3px;
+            font-weight: 500;
+        }
+
+        td:nth-child(even) {
+            text-align: right;
+            font-weight: 300;
+        }
+
+        .table_color tr:nth-child(even) {
+            background-color: #dddddd;
+        }
     </style>
 </head>
 
@@ -57,30 +89,44 @@
                 maxZoom: 16.7
             })
         );
+        // // Create dollar sign number formatter.
+        var formatter = new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 0
+        });
         map.on('load', function () {
             map.on('click', 'parcels_fill', function (e) {
+                let p = e.features[0].properties;
+                let description = `
+                    <table class="table_color" style="margin-top:10px;">
+                    <tr><td style="font-size:15px;">Total Value</td>
+                        <td id="studentid" style="font-weight:500;font-size:15px;">${formatter.format(p.total_valu)}</td>
+                    </tr>
+                    <tr><td>Name</td><td> ${p.owner_name} </td></tr>
+                    <tr><td>Year Built</td><td> ${p.ccyrblt} </td></tr>
+                    <tr><td>Schedum</td><td> ${p.schednum} </td></tr>
+                    <tr><td>Disability</td><td> <a target="_blank" href="https://www.denvergov.org/property/realproperty/summary/${p.pin}">More Info</a> </td></tr>
+                    </table>`;
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
-                    .setHTML(e.features[0].properties.total_valu)
+                    .setHTML(description)
                     .addTo(map);
+                map.removeFeatureState({
+                    source: 'composite',
+                    sourceLayer: 'parcels'
+                });
+                map.setFeatureState({
+                    source: 'composite',
+                    sourceLayer: 'parcels',
+                    id: e.features[0].id
+                }, {
+                    hover: true
+                });
             });
             map.on('click', function (e) {
                 var features = map.queryRenderedFeatures(e.point);
-               console.log(features)
-            });
-
-            // Change the cursor to a pointer when the mouse is over the states layer.
-            map.on('mouseenter', 'parcels_fill', function () {
-                map.setFeatureState(
-            {
-              source: "parcels_fill",
-              id: e.features[0].id
-            },
-            {
-              id: 1
-            }
-          );
-                map.getCanvas().style.cursor = 'pointer';
+                console.log(features)
             });
 
             // Change it back to a pointer when it leaves.
