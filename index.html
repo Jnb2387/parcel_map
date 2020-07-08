@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <title>I Like This House</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="icon" href="./favicon.ico"/>
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
     <style>
@@ -66,7 +67,7 @@
         mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZGxleTIzODciLCJhIjoiY2pnMTk0ZTk2NmJzOTJxbnZpMjl1ZGsxbiJ9.L-BSY_VjUrkHL3ov0OciKQ';
         var map = new mapboxgl.Map({
             container: 'map', // container id
-            style: 'mapbox://styles/bradley2387/ckc9v7p5q3el91immy8mnucgv', // stylesheet location
+            style: 'mapbox://styles/bradley2387/ckc9v7p5q3el91immy8mnucgv/draft', // stylesheet location
             center: [-104.9, 39.75], // starting position [lng, lat]
             zoom: 10, // starting zoom
             hash: true
@@ -89,40 +90,40 @@
             positionOptions: {
                 enableHighAccuracy: true
             },
+            fitBoundsOptions: {
+                maxZoom: 16.7
+            },
             trackUserLocation: true,
-            maxZoom: 16.7
         });
         geocoder.on('result', function (e) {
-// wait until the map has finished flying to the searched point
-    map.once('moveend', function () {
-        // add the result as a point in the 'search_point' layer to show up as marker
-        var geocoder_result = e.result.geometry;
-        map.getSource('search').setData(geocoder_result);
+            // wait until the map has finished flying to the searched point
+            map.once('moveend', function () {
+                // add the result as a point in the 'search_point' layer to show up as marker
+                var geocoder_result = e.result.geometry;
+                map.getSource('search').setData(geocoder_result);
 
-        //project to use (pixel xy coordinates instead of lat/lon for WebGL)
-        var geocoder_point = map.project([e.result.center[0], e.result.center[1]]);
+                //project to use (pixel xy coordinates instead of lat/lon for WebGL)
+                var geocoder_point = map.project([e.result.center[0], e.result.center[1]]);
 
-        var parcel = map.queryRenderedFeatures(geocoder_point, {
-            layers: ['neighborhoods']
+                var parcel = map.queryRenderedFeatures(geocoder_point, {
+                    layers: ['neighborhoods']
+                });
+                document.querySelector("#nbhd_name").innerHTML = parcel
+
+            });
         });
-        document.querySelector("#nbhd_name").innerHTML= parcel
-
-    });
-});
         map.addControl(geolocate);
         geolocate.on('geolocate', function (e) {
             console.log(e)
 
             var geocoder_result = [e.coords.longitude, e.coords.latitude];
-            console.log(geocoder_result)
             //project to use (pixel xy coordinates instead of lat/lon for WebGL)
             var geocoder_point = map.project(geocoder_result);
-            console.log(geocoder_point)
-            var parcel = map.queryRenderedFeatures(geocoder_point, {
-                layers: ['neighborhoods']
+            var nbhood = map.queryRenderedFeatures(geocoder_point, {
+                layers: ['neighborhoods_fill']
             });
-            console.log(parcel)
-            document.querySelector("#nbhd_name").innerHTML= parcel
+            console.log(nbhood)
+            document.querySelector("#nbhd_name").innerHTML = nbhood
         })
 
         // // Create dollar sign number formatter.
