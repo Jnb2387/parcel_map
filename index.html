@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>I Like This House</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <link rel="icon" href="./favicon.ico"/>
+    <link rel="icon" href="./favicon.ico" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
     <style>
@@ -52,6 +52,19 @@
         .table_color tr:nth-child(even) {
             background-color: #dddddd;
         }
+
+        .style-overlay {
+            z-index: 1;
+            position: absolute;
+            padding: 0px 7px 0px 7px;
+            bottom: 5px;
+            right: calc(50% - 1em);
+            ;
+            max-width: 155px;
+            background: rgba(255, 255, 255, 1);
+            margin-right: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -62,7 +75,7 @@
         href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
         type="text/css" />
     <div id="map"></div>
-    <span id="nbhd_name"></span>
+    <div class="style-overlay" id="nbhd_name"></div>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZGxleTIzODciLCJhIjoiY2pnMTk0ZTk2NmJzOTJxbnZpMjl1ZGsxbiJ9.L-BSY_VjUrkHL3ov0OciKQ';
         var map = new mapboxgl.Map({
@@ -114,16 +127,13 @@
         });
         map.addControl(geolocate);
         geolocate.on('geolocate', function (e) {
-            console.log(e)
-
             var geocoder_result = [e.coords.longitude, e.coords.latitude];
             //project to use (pixel xy coordinates instead of lat/lon for WebGL)
             var geocoder_point = map.project(geocoder_result);
             var nbhood = map.queryRenderedFeatures(geocoder_point, {
                 layers: ['neighborhoods_fill']
             });
-            console.log(nbhood)
-            document.querySelector("#nbhd_name").innerHTML = nbhood
+            document.querySelector("#nbhd_name").innerHTML = nbhood[0].properties.nbhd_name
         })
 
         // // Create dollar sign number formatter.
@@ -175,7 +185,6 @@
                     hover: true
                 });
             });
-
 
             map.on('mouseenter', 'parcels_fill', function () {
                 map.getCanvas().style.cursor = 'pointer';
