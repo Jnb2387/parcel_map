@@ -173,6 +173,7 @@
                 });
             });
 
+            //Parcels
             map.on('click', 'parcels_fill', function (e) {
                 let p = e.features[0].properties;
                 let description = `
@@ -213,7 +214,7 @@
             });
 
             //Neighborhoods
-            map.on('click', 'neighborhoods_fill', function (e) {console.log(e.features)
+            map.on('click', 'neighborhoods_fill', function (e) {
                 if (map.getZoom() > 15) { return }
                 let p = e.features[0].properties;
                 let description = `
