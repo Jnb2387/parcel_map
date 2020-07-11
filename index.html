@@ -135,10 +135,10 @@
             document.querySelector("#nbhd_name").innerHTML = `
                 <h3 style="margin:7px 0 7px 0">${nbhood[0].properties.nbhd_name}</h3>
                 <p><b>Price Avg:</b> ${formatter.format(nbhood[0].properties.total_valu_avg)}</p>
-                <p><b>Land Value Avg:</b> ${nbhood[0].properties.land_value_avg}</p>
-                <p><b>Improvement Avg:</b> ${nbhood[0].properties.improvemen_avg}</p>
-                <p><b>Total Value Min:</b> ${nbhood[0].properties.total_valu_min}</p>
-                <p><b>Total Value Max:</b> ${nbhood[0].properties.total_valu_max}</p>
+                <p><b>Land Value Avg:</b> ${formatter.format(nbhood[0].properties.land_value_avg)}</p>
+                <p><b>Improvement Avg:</b> ${formatter.format(nbhood[0].properties.improvemen_avg)}</p>
+                <p><b>Total Value Min:</b> ${formatter.format(nbhood[0].properties.total_valu_min)}</p>
+                <p><b>Total Value Max:</b> ${formatter.format(nbhood[0].properties.total_valu_max)}</p>
                 <p><b># of Homes:</b> ${nbhood[0].properties.num_of_houses}</p>
                 <p><b>Avg Lot Size:</b> ${nbhood[0].properties.average_lot_acreage} acre</p>
             `
