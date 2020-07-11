@@ -56,13 +56,13 @@
         .style-overlay {
             z-index: 1;
             position: absolute;
-            padding: 0px 7px 0px 7px;
-            bottom: 5px;
-            right: calc(50% - 1em);
-            ;
+            padding: 0px 5px 0px 5px;
+            bottom: 0%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%);
             max-width: 155px;
             background: rgba(255, 255, 255, 1);
-            margin-right: 10px;
             border-radius: 5px;
         }
     </style>
@@ -75,7 +75,9 @@
         href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
         type="text/css" />
     <div id="map"></div>
-    <div class="style-overlay" id="nbhd_name"></div>
+    <div class="style-overlay">
+        <span id="nbhd_name"></span>
+    </div>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZGxleTIzODciLCJhIjoiY2pnMTk0ZTk2NmJzOTJxbnZpMjl1ZGsxbiJ9.L-BSY_VjUrkHL3ov0OciKQ';
         var map = new mapboxgl.Map({
@@ -91,7 +93,6 @@
             flyTo: {
                 zoom: 16,
                 speed: 19,
-
             },
             collapsed: true
         })
@@ -126,14 +127,14 @@
             });
         });
         map.addControl(geolocate);
-        geolocate.on('geolocate', function (e) {
+        geolocate.on('geolocate', function (e) { 
             var geocoder_result = [e.coords.longitude, e.coords.latitude];
             //project to use (pixel xy coordinates instead of lat/lon for WebGL)
             var geocoder_point = map.project(geocoder_result);
             var nbhood = map.queryRenderedFeatures(geocoder_point, {
                 layers: ['neighborhoods_fill']
             });
-            document.querySelector("#nbhd_name").innerHTML = nbhood[0].properties.nbhd_name
+            document.querySelector("#nbhd_name").innerHTML = `<h4 style="margin:7px 0 7px 0">${nbhood[0].properties.nbhd_name}</h4>`
         })
 
         // // Create dollar sign number formatter.
@@ -143,11 +144,11 @@
             minimumFractionDigits: 0
         });
         map.on('load', function () {
-            // geolocate.trigger();
+            geolocate.trigger();
 
             map.on('click', function (e) {
-                var features = map.queryRenderedFeatures(e.point);
-                console.log(features)
+                // var features = map.queryRenderedFeatures(e.point);
+                // console.log(features)
                 map.removeFeatureState({
                     source: 'composite',
                     sourceLayer: 'parcels'
