@@ -211,6 +211,39 @@
             map.on('mouseleave', 'parcels_fill', function () {
                 map.getCanvas().style.cursor = '';
             });
+
+            //Neighborhoods
+            map.on('click', 'neighborhoods_fill', function (e) {console.log(e.features)
+                if (map.getZoom() > 15) { return }
+                let p = e.features[0].properties;
+                let description = `
+                <table class="table_color" style="margin-top:10px;">
+                    <h4 style="text-align:center; margin:0 0 0 0;">${p.nbhd_name}</h4>
+                    <tr><td>Price Avg</td><td> ${p.total_valu_avg} </td></tr>
+                    <tr><td>Land Value</td><td> ${p.land_value_avg} </td></tr>
+                    <tr><td>Improvement Avg</td><td> ${p.improvemen_avg} </td></tr>
+                    <tr><td>Total Value Min</td><td>  ${p.total_valu_min} </td></tr>
+                    <tr><td>Total Value Max</td><td> ${p.total_valu_max} </td></tr>
+                    <tr><td># of Homes</td><td> ${p.num_of_houses} </td></tr>
+                    <tr><td>Avg Lot Size</td><td>  ${p.average_lot_acreage} </td></tr>
+                </table>
+                `;
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(description)
+                    .addTo(map);
+                map.removeFeatureState({
+                    source: 'composite',
+                    sourceLayer: 'neighborhoods'
+                });
+                map.setFeatureState({
+                    source: 'composite',
+                    sourceLayer: 'neighborhoods',
+                    id: e.features[0].id
+                }, {
+                    hover: true
+                });
+            });
         });
     </script>
 
