@@ -57,7 +57,7 @@
             z-index: 1;
             position: absolute;
             padding: 0px 5px 0px 5px;
-            bottom: 0%;
+            bottom: 3%;
             left: 50%;
             transform: translate(-50%, -3%);
             /* max-width: 155px; */
@@ -89,7 +89,7 @@
     </div>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZGxleTIzODciLCJhIjoiY2pnMTk0ZTk2NmJzOTJxbnZpMjl1ZGsxbiJ9.L-BSY_VjUrkHL3ov0OciKQ';
-        var map = new mapboxgl.Map({
+        let map = new mapboxgl.Map({
             container: 'map', // container id
             style: 'mapbox://styles/bradley2387/ckc9v7p5q3el91immy8mnucgv/draft', // stylesheet location
             center: [-104.9, 39.75], // starting position [lng, lat]
@@ -118,45 +118,42 @@
             },
             trackUserLocation: true,
         });
+        function nbhood_display(point) {
+            let nbhood = map.queryRenderedFeatures(point, {
+                layers: ['neighborhoods_fill']
+            });
+            if (nbhood.length < 1) { return }
+            document.querySelector("#nbhd_name").innerHTML = `
+                <h4 style="margin:7px 0 7px 0">${nbhood[0].properties.nbhd_name}</h4>
+                <p>Price Avg: ${nbhood[0].properties.total_valu_avg}</p>
+                <p>Land Value Avg: ${nbhood[0].properties.land_value_avg}</p>
+                <p>Improvement Avg: ${nbhood[0].properties.improvemen_avg}</p>
+                <p>Total Value Min: ${nbhood[0].properties.total_valu_min}</p>
+                <p>Total Value Max: ${nbhood[0].properties.total_valu_max}</p>
+                <p># of Homes: ${nbhood[0].properties.num_of_houses}</p>
+                <p>Avg Lot Size: ${nbhood[0].properties.average_lot_acreage} acre</p>
+            `
+        }
         geocoder.on('result', function (e) {
             // wait until the map has finished flying to the searched point
             map.once('moveend', function () {
                 // add the result as a point in the 'search_point' layer to show up as marker
-                var geocoder_result = e.result.geometry;
-                map.getSource('search').setData(geocoder_result);
-
+                let geocoder_result = e.result.geometry;
                 //project to use (pixel xy coordinates instead of lat/lon for WebGL)
-                var geocoder_point = map.project([e.result.center[0], e.result.center[1]]);
-
-                var parcel = map.queryRenderedFeatures(geocoder_point, {
-                    layers: ['neighborhoods']
-                });
-                document.querySelector("#nbhd_name").innerHTML = parcel
-
+                let geocoder_point = map.project([e.result.center[0], e.result.center[1]]);
+                nbhood_display(geocoder_point)
             });
         });
         map.addControl(geolocate);
         geolocate.on('geolocate', function (e) {
-            var geocoder_result = [e.coords.longitude, e.coords.latitude];
+            let geocoder_result = [e.coords.longitude, e.coords.latitude];
             //project to use (pixel xy coordinates instead of lat/lon for WebGL)
-            var geocoder_point = map.project(geocoder_result);
-            var nbhood = map.queryRenderedFeatures(geocoder_point, {
-                layers: ['neighborhoods_fill']
-            });
-            document.querySelector("#nbhd_name").innerHTML = `
-            <h4 style="margin:7px 0 7px 0">${nbhood[0].properties.nbhd_name}</h4>
-            <p>Price Avg: ${nbhood[0].properties.total_valu_avg}</p>
-            <p>Land Value Avg: ${nbhood[0].properties.land_value_avg}</p>
-            <p>Improvement Avg: ${nbhood[0].properties.improvemen_avg}</p>
-            <p>Total Value Min: ${nbhood[0].properties.total_valu_min}</p>
-            <p>Total Value Max: ${nbhood[0].properties.total_valu_max}</p>
-            <p># of Homes: ${nbhood[0].properties.num_of_houses}</p>
-            <p>Avg Lot Size: ${nbhood[0].properties.average_lot_acreage} acre</p>
-            `
+            let geolocate_point = map.project(geocoder_result);
+            nbhood_display(geolocate_point)
         })
 
         // // Create dollar sign number formatter.
-        var formatter = new Intl.NumberFormat("en-US", {
+        let formatter = new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
             minimumFractionDigits: 0
@@ -165,11 +162,15 @@
             geolocate.trigger();
 
             map.on('click', function (e) {
-                // var features = map.queryRenderedFeatures(e.point);
+                // let features = map.queryRenderedFeatures(e.point);
                 // console.log(features)
                 map.removeFeatureState({
                     source: 'composite',
                     sourceLayer: 'parcels'
+                });
+                map.removeFeatureState({
+                    source: 'composite',
+                    sourceLayer: 'neighborhoods'
                 });
             });
 
