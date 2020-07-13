@@ -31,7 +31,9 @@ let formatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
   minimumFractionDigits: 0,
+  maximumSignificantDigits: 3
 });
+
 map.addControl(geocoder);
 map.addControl(new mapboxgl.NavigationControl(), "top-right");
 map.addControl(new mapboxgl.FullscreenControl());
