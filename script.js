@@ -4,7 +4,9 @@ for (let i = 0; i < coll.length; i++) {
   coll[i].addEventListener("click", function () {
     this.classList.toggle("active");
     let content = this.nextElementSibling;
-    content.style.maxHeight ? content.style.maxHeight = null: content.style.maxHeight = content.scrollHeight + "px";
+    content.style.maxHeight
+      ? (content.style.maxHeight = null)
+      : (content.style.maxHeight = content.scrollHeight + "px");
   });
 }
 
@@ -15,16 +17,16 @@ let map = new mapboxgl.Map({
   style: "mapbox://styles/bradley2387/ckc9v7p5q3el91immy8mnucgv", // /draft', // stylesheet location
   center: [-104.9, 39.75], // starting position [lng, lat]
   zoom: 10, // starting zoom
-  hash: true,
+  hash: true
 });
 let geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
   mapboxgl: mapboxgl,
   flyTo: {
     zoom: 16,
-    speed: 19,
+    speed: 19
   },
-  collapsed: true,
+  collapsed: true
 });
 // // Create dollar sign number formatter.
 let formatter = new Intl.NumberFormat("en-US", {
@@ -40,20 +42,25 @@ map.addControl(new mapboxgl.FullscreenControl());
 // Add geolocate control to the map.
 let geolocate = new mapboxgl.GeolocateControl({
   positionOptions: {
-    enableHighAccuracy: true,
+    enableHighAccuracy: true
   },
   fitBoundsOptions: {
-    maxZoom: 16.7,
+    maxZoom: 16.7
   },
-  trackUserLocation: true,
+  trackUserLocation: true
 });
 
 //Function that will take a point and return the neighborhood info
 function nbhood_display(point) {
   let nbhood = map.queryRenderedFeatures(point, {
-    layers: ["neighborhoods_fill"],
+    layers: ["neighborhoods_fill"]
   });
   if (nbhood.length < 1) {
+    let co_town = map.queryRenderedFeatures(point, {
+      layers: ["co_town_fill"]
+    });
+    document.querySelector("#nbhd_name").innerHTML = `
+        <h3 style="margin:7px 0 1px 0">${co_town[0].properties.name}</h3>`;
     return;
   }
   document.querySelector("#nbhd_name").innerHTML = `
@@ -107,11 +114,11 @@ map.on("load", function () {
     // console.log(features)
     map.removeFeatureState({
       source: "composite",
-      sourceLayer: "parcels",
+      sourceLayer: "parcels"
     });
     map.removeFeatureState({
       source: "composite",
-      sourceLayer: "neighborhoods",
+      sourceLayer: "neighborhoods"
     });
   });
 
@@ -138,16 +145,16 @@ map.on("load", function () {
     new mapboxgl.Popup().setLngLat(e.lngLat).setHTML(description).addTo(map);
     map.removeFeatureState({
       source: "composite",
-      sourceLayer: "parcels",
+      sourceLayer: "parcels"
     });
     map.setFeatureState(
       {
         source: "composite",
         sourceLayer: "parcels",
-        id: e.features[0].id,
+        id: e.features[0].id
       },
       {
-        hover: true,
+        hover: true
       }
     );
   });
@@ -159,7 +166,7 @@ map.on("load", function () {
     map.getCanvas().style.cursor = "";
   });
 
-  //Neighborhoods
+  //Denver Neighborhoods
   map.on("click", "neighborhoods_fill", function (e) {
     //console.log(e.features)
     if (map.getZoom() > 15) {
@@ -191,16 +198,47 @@ map.on("load", function () {
     new mapboxgl.Popup().setLngLat(e.lngLat).setHTML(description).addTo(map);
     map.removeFeatureState({
       source: "composite",
-      sourceLayer: "neighborhoods",
+      sourceLayer: "neighborhoods"
+    });
+    map.removeFeatureState({
+      source: "composite",
+      sourceLayer: "co_towns"
     });
     map.setFeatureState(
       {
         source: "composite",
         sourceLayer: "neighborhoods",
-        id: e.features[0].id,
+        id: e.features[0].id
       },
       {
-        hover: true,
+        hover: true
+      }
+    );
+  });
+  //Cities
+  map.on("click", "co_towns_fill", function (e) {
+    if (map.getZoom() > 15) {
+      return;
+    }
+    let p = e.features[0].properties;
+    let description = `<h4 style="text-align:center; margin:0 0 0 0;">${p.name}</h4>`;
+    new mapboxgl.Popup().setLngLat(e.lngLat).setHTML(description).addTo(map);
+    map.removeFeatureState({
+      source: "composite",
+      sourceLayer: "co_towns"
+    });
+    map.removeFeatureState({
+      source: "composite",
+      sourceLayer: "neighborhoods"
+    });
+    map.setFeatureState(
+      {
+        source: "composite",
+        sourceLayer: "co_towns",
+        id: e.features[0].id
+      },
+      {
+        hover: true
       }
     );
   });
