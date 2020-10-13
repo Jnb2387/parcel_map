@@ -15,9 +15,24 @@ body {
 }
 
 .mapboxgl-popup-close-button {
-    right: 4px;
-    font-size: 25px;
-}
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: #005073;
+    width: 25px;
+    height: 25px;
+    z-index: 1;
+    padding: 0px;
+    color: white;
+    text-align: center;
+  }
+  
+  .mapboxgl-popup-close-button:hover {
+    color: black;
+  }
 
 table {
     font-family: "Roboto", sans-serif;
